@@ -1,0 +1,37 @@
+#!/usr/bin/env -S depict -B 0.05 0.12 0.18
+#
+Genetic simulieren
+
+Warum?
+# optimisierung
+
+Was?
+# vereinfachter vererbungs process
+#
+
+
+# Das sytem was wir vereinfacht modelieren
+@kreislauf.svg
+
+Anfangspopulat
+• Hohe Anzahl an Individuen
+• Zufällige Gene
+
+Selektion
+• hohes Fitnesslevel > warscheinliche vererben
+• niedriges Fitnesslevel > unwarscheinliche vererbung
+
+Crossover
+• Paare aus der Selektion gewählt
+• DNA der kinder aus DNA der Eltern zusammengesetzt
+
+Mutation
+• Gene der neuen Generation werden zufällig mutiert
+
+Genetische algorithmen in localen maxima steckenbleiben
+
+@extrema.png
+# Um dies zu minimieren muss die Anfangspopulat und die Mutationsrate angepasst
+# werden und am Besten mehrere simulationen durchgeführt werden.
+
+#https://youtu.be/_KC3MDtr-Ng
