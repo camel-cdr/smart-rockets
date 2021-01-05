@@ -16,8 +16,6 @@
 #define NK_INCLUDE_FONT_BAKING
 #define NK_INCLUDE_DEFAULT_FONT
 #define NK_INCLUDE_STANDARD_VARARGS
-#define NK_IMPLEMENTATION
-#define NK_SDL_GL3_IMPLEMENTATION
 #define NK_KEYSTATE_BASED_INPUT
 #include "nuklear/nuklear.h"
 #include "nuklear/demo/sdl_opengl3/nuklear_sdl_gl3.h"
@@ -94,7 +92,7 @@ int main(void)
 		die("Unable to create window: %s", SDL_GetError());
 
 	context = SDL_GL_CreateContext(window);
-	SDL_GL_SetSwapInterval(0);
+	//SDL_GL_SetSwapInterval(0);
 
 	/* OpenGL */
 	GL_CALL(glViewport(0, 0, width, height));

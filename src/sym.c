@@ -26,11 +26,11 @@ static void sym_init(void)
 	sym.num_obs = 150;
 	sym.obs = malloc(sym.num_obs * sizeof *sym.obs);
 	/* The first obstical is the target */
-	sym.obs[0].x = sym.target.x - OBSTACLE_SIZE;
-	sym.obs[0].y = sym.target.y - OBSTACLE_SIZE;
-	sym.obs[0].z = OBSTACLE_SIZE;
-	sym.obs[0].w = OBSTACLE_SIZE;
-	for (i = 1; i < sym.num_obs; ++i) {
+	sym.tarobs.x = sym.target.x - OBSTACLE_SIZE;
+	sym.tarobs.y = sym.target.y - OBSTACLE_SIZE;
+	sym.tarobs.z = OBSTACLE_SIZE;
+	sym.tarobs.w = OBSTACLE_SIZE;
+	for (i = 0; i < sym.num_obs; ++i) {
 		sym.obs[i].x = (float)rng_next() / UINT32_MAX * 3.0f;
 		sym.obs[i].y = (float)rng_next() / UINT32_MAX * 3.0f;
 		if (rng_next() % 2)
@@ -50,12 +50,13 @@ static void sym_init(void)
 	"layout (location = 1) in vec4 rect; \n"
 	"out vec4 vertColor; \n"
 	"uniform mat4 proj; \n"
+	"uniform vec4 color; \n"
 	"uniform mat4 view; \n"
 	"\n"
 	"void main() \n"
 	"{ \n"
 	"	gl_Position = proj * view * vec4(pos * rect.zw + rect.xy, 0.0, 1.0); \n"
-	"	vertColor = vec4(1, 1, 1, 1); \n"
+	"	vertColor = color; \n"
 	"} \n"
 	,
 	"#version 330 \n"
@@ -122,10 +123,23 @@ static void sym_update_ui(float dt)
 		sym.isrunning = 0;
 
 	nk_layout_row_dynamic(nkctx, 20, 2);
-	if (nk_button_label(nkctx, "Run"))
-		printf("button pressed\n");
-	if (nk_button_label(nkctx, "Run once"))
-		printf("button pressed\n");
+	if (nk_button_label(nkctx, "Reset")) {
+		for (i = 0; i < ARRAY_SIZE(sym.pop); ++i) {
+			sym.pop[i].count = 0;
+		}
+	}
+	if (nk_button_label(nkctx, "Run once")) {
+		size_t i;
+		for (; sym.move < MOVE_COUNT; ++sym.move) {
+			for (i = 0; i < ARRAY_SIZE(sym.pop); ++i) {
+				pop_update(&sym.pop[i], sym.move, sym.num_obs, sym.obs, sym.tarobs);
+			}
+		}
+		sym.move = 0;
+		for (i = 0; i < ARRAY_SIZE(sym.pop); ++i) {
+			pop_new_gen(&sym.pop[i], sym.target);
+		}
+	}
 
 	for (i = 0; i < ARRAY_SIZE(sym.pop); ++i) {
 		nk_layout_row_dynamic(nkctx, 20, 1);
@@ -151,6 +165,8 @@ static void sym_update(float dt)
 {
 	size_t i;
 	const Uint8* kbd = SDL_GetKeyboardState(NULL);
+
+	dt *= 35.0;
 
 	if (kbd[SDL_SCANCODE_J])
 		sym.zoom -= dt * sym.zoom;
@@ -184,7 +200,7 @@ static void sym_update(float dt)
 	}
 
 	for (i = 0; i < ARRAY_SIZE(sym.pop); ++i) {
-		pop_update(&sym.pop[i], sym.move, sym.num_obs, sym.obs);
+		pop_update(&sym.pop[i], sym.move, sym.num_obs, sym.obs, sym.tarobs);
 	}
 }
 
@@ -218,24 +234,28 @@ static void sym_render(float width, float height, int isMouseDown)
 				-aspect * sym.zoom, aspect * sym.zoom,
 				-10.0, 10.0);
 	}
-	sym.obs[0].x = sym.target.x - OBSTACLE_SIZE;
-	sym.obs[0].y = sym.target.y - OBSTACLE_SIZE;
+	sym.tarobs.x = sym.target.x - OBSTACLE_SIZE;
+	sym.tarobs.y = sym.target.y - OBSTACLE_SIZE;
 	Mat4 view = mat4_translation(sym.pos);
 
 	GL_CALL(glUseProgram(sym.shader));
 	GL_CALL(glBindVertexArray(sym.vao));
 	GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, sym.ivbo));
 
-	GL_CALL(glBufferSubData(GL_ARRAY_BUFFER, 0,
-	                        sizeof *sym.obs * sym.num_obs,
-	                        sym.obs));
-
 	glUniformMatrix4fv(glGetUniformLocation(sym.shader, "proj"),
 	                                        1, GL_FALSE, &proj.m00);
 	glUniformMatrix4fv(glGetUniformLocation(sym.shader, "view"),
 	                                        1, GL_FALSE, &view.m00);
 
+	GL_CALL(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof sym.tarobs, &sym.tarobs));
+	glUniform4f(glGetUniformLocation(sym.shader, "color"), 0, 1, 0, 1);
+	GL_CALL(glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1));
+
+
+	GL_CALL(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof *sym.obs * sym.num_obs, sym.obs));
+	glUniform4f(glGetUniformLocation(sym.shader, "color"), 1, 1, 1, 1);
 	GL_CALL(glDrawArraysInstanced(GL_TRIANGLES, 0, 6, sym.num_obs));
+
 
 	for (i = 0; i < ARRAY_SIZE(sym.pop); ++i) {
 		pop_render(&sym.pop[i], proj, view);

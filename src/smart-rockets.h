@@ -13,7 +13,7 @@ typedef uint64_t u64;
 #define MAX_ACCELERATION 0.001f
 
 #define ROCKET_SIZE "0.02"
-#define OBSTACLE_SIZE 0.01f
+#define OBSTACLE_SIZE 0.05f
 
 #define CLAMP(min, v, max) (((v)<(min))?(min):(((v)>(max))?(max):(v)))
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof*(a))
@@ -41,6 +41,7 @@ struct Population {
 	Vec3 *pos;
 	Vec2 *vel;
 	float *fit;
+	size_t *sorted;
 	Vec2 *(acc[MOVE_COUNT]);
 	GLuint ivbo, vbo, vao, shader;
 	/* adjustable in gui */
@@ -51,7 +52,7 @@ struct Population {
 };
 static void pop_init(struct Population *this);
 static void pop_new_gen(struct Population *this, Vec2 target);
-static void pop_update(struct Population *this, size_t move, size_t num_obs, Vec4 *obs);
+static void pop_update(struct Population *this, size_t move, size_t num_obs, Vec4 *obs, Vec4 tarobs);
 static void pop_render(struct Population *this, Mat4 proj, Mat4 view);
 
 /* symulation */
@@ -66,6 +67,7 @@ struct Sym {
 
 	size_t num_obs;
 	Vec4 *obs;
+	Vec4 tarobs;
 	GLuint ivbo, vbo, vao, shader;
 };
 static void sym_init(void);

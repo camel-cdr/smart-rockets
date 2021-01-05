@@ -119,7 +119,7 @@ static size_t turnament_slection(struct Population *pop)
 {
 	size_t i, best = 0;
 	float max = 0;
-	for (i = 0; i < 25; ++i) {
+	for (i = 0; i < pop->count_slider / 10; ++i) {
 		size_t idx = rng_next() % pop->count;
 		if (pop->fit[idx] > max) {
 			max = pop->fit[idx];
@@ -181,7 +181,6 @@ static void pop_new_gen(struct Population *this, Vec2 target)
 				}
 			}
 		}
-
 	}
 
 	/* resize and randomize dna(acc) between count and count_slider */
@@ -213,7 +212,7 @@ static void pop_new_gen(struct Population *this, Vec2 target)
 	                     this->pos,
 	                     GL_DYNAMIC_DRAW));
 }
-static void pop_update(struct Population *this, size_t move, size_t num_obs, Vec4 *obs)
+static void pop_update(struct Population *this, size_t move, size_t num_obs, Vec4 *obs, Vec4 tarobs)
 {
 	size_t i, j;
 	for (i = 0; i < this->count; ++i) {
@@ -225,7 +224,7 @@ static void pop_update(struct Population *this, size_t move, size_t num_obs, Vec
 		if (*fit != 0)
 			continue;
 
-		if (fabs(pos->x - obs[0].x) < obs[0].z && fabs(pos->y - obs[0].y) < obs[0].w) {
+		if (fabs(pos->x - tarobs.x) < tarobs.z && fabs(pos->y - tarobs.y) < tarobs.w) {
 			*fit = (float)MOVE_COUNT - move;
 			pos->z -= 4 * PI32;
 			continue;
