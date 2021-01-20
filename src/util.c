@@ -113,4 +113,3 @@ static void rng_seed(void)
 	s[3] = s3;
 }
 
-

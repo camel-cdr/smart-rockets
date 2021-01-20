@@ -23,6 +23,7 @@ static void sym_init(void)
 		pop_init(&sym.pop[i]);
 	}
 
+	sym.skip_slider = 1;
 	sym.num_obs = 150;
 	sym.obs = malloc(sym.num_obs * sizeof *sym.obs);
 	/* The first obstical is the target */
@@ -128,18 +129,25 @@ static void sym_update_ui(float dt)
 			sym.pop[i].count = 0;
 		}
 	}
-	if (nk_button_label(nkctx, "Run once")) {
-		size_t i;
-		for (; sym.move < MOVE_COUNT; ++sym.move) {
-			for (i = 0; i < ARRAY_SIZE(sym.pop); ++i) {
-				pop_update(&sym.pop[i], sym.move, sym.num_obs, sym.obs, sym.tarobs);
+
+	if (nk_button_label(nkctx, "Skip")) {
+		size_t i, j;
+		for (i = 0; i < sym.skip_slider; ++i) {
+			for (; sym.move < MOVE_COUNT; ++sym.move) {
+				for (j = 0; j < ARRAY_SIZE(sym.pop); ++j) {
+					pop_update(&sym.pop[j], sym.move, sym.num_obs, sym.obs, sym.tarobs);
+				}
 			}
-		}
-		sym.move = 0;
-		for (i = 0; i < ARRAY_SIZE(sym.pop); ++i) {
-			pop_new_gen(&sym.pop[i], sym.target);
+			for (j = 0; j < ARRAY_SIZE(sym.pop); ++j) {
+				pop_new_gen(&sym.pop[j], sym.target);
+			}
+			sym.move = 0;
+
 		}
 	}
+
+	nk_layout_row_dynamic(nkctx, 20, 1);
+	sym.skip_slider = nk_propertyi(nkctx, "#skip amount:", 1, sym.skip_slider, 1000, 1, 5.0);
 
 	for (i = 0; i < ARRAY_SIZE(sym.pop); ++i) {
 		nk_layout_row_dynamic(nkctx, 20, 1);
@@ -156,7 +164,7 @@ static void sym_update_ui(float dt)
 		}
 
 		nk_layout_row_dynamic(nkctx, 20, 1);
-		sym.pop[i].mutationrate = nk_propertyf(nkctx, "#Mutation rate:", 0, sym.pop[i].mutationrate, 100.0, 0.1, 0.001);
+		sym.pop[i].mutationrate = nk_propertyf(nkctx, "#Mutation rate:", 0, sym.pop[i].mutationrate, 100.0, 0.1, 0.025);
 	}
 	nk_end(nkctx);
 }
@@ -262,3 +270,4 @@ static void sym_render(float width, float height, int isMouseDown)
 	}
 	nk_sdl_render(NK_ANTI_ALIASING_ON, MAX_VERT_BUF, MAX_ELEM_BUF);
 }
+

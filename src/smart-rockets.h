@@ -12,9 +12,10 @@ typedef uint64_t u64;
 #define MAX_POPULATION_SIZE 500000
 #define MAX_ACCELERATION 0.001f
 
-#define ROCKET_SIZE "0.02"
+#define ROCKET_SIZE "0.05"
 #define OBSTACLE_SIZE 0.05f
 
+#define MAX(a, b) (((a)>(b))?(a):(b))
 #define CLAMP(min, v, max) (((v)<(min))?(min):(((v)>(max))?(max):(v)))
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof*(a))
 
@@ -61,6 +62,7 @@ struct Sym {
 	size_t move;
 	struct Population pop[2];
 	int isrunning;
+	size_t skip_slider;
 	/* cam */
 	Vec3 pos;
 	float zoom;

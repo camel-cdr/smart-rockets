@@ -115,7 +115,7 @@ static void pop_init(struct Population *this)
 	}
 
 }
-static size_t turnament_slection(struct Population *pop)
+static size_t turnament_selection(struct Population *pop)
 {
 	size_t i, best = 0;
 	float max = 0;
@@ -153,16 +153,17 @@ static void pop_new_gen(struct Population *this, Vec2 target)
 		/* assign fitness scores */
 		for (r = 0; r < this->count; ++r) {
 			if (this->fit[r] < 1.0f) {
-				float dist = fabsf(this->pos[r].x - target.x) + fabsf(this->pos[r].y - target.y);
-				dist = CLAMP(0.0, 1.0f/dist, 1.0);
-				this->fit[r] = dist;
+				float dist = powf(this->pos[r].x - target.x, 2.0) + powf(this->pos[r].y - target.y, 2.0);
+				this->fit[r] = 1.0f/dist;
+			} else {
+				this->fit[r] = powf(this->fit[r], this->fit[r]);
 			}
 		}
 
 		/* accept reject */
 		for (r = 0; r < this->count; ++r) {
-			size_t parentA = turnament_slection(this);
-			size_t parentB = turnament_slection(this);
+			size_t parentA = turnament_selection(this);
+			size_t parentB = turnament_selection(this);
 			size_t split = rng_next() % MOVE_COUNT;
 			for (m = 0; m < split; ++m) {
 				this->acc[m][r] = buf_acc[m][parentA];
