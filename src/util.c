@@ -63,7 +63,7 @@ static float fast_atan2(float y, float x)
 
 
 
-static u32 s[4] = { 0x7ba00338, 0x923ee159, 0x92b0d236, 0x5ae756dc };
+static u32 s[4] = { 0x7ba00339, 0x923ee15a, 0x92b0d236, 0x5ae756dd };
 
 static u32 rng_next(void)
 {

@@ -1,6 +1,6 @@
 .POSIX:
 
-CFLAGS := -Wall -Wextra -pedantic -Os -march=native
+CFLAGS := -Wall -Wextra -pedantic -Ofast -march=native
 LIBS := `pkg-config --cflags --libs glew sdl2` -lm -I .
 
 smart-rockets: src/nuklear.o src/*

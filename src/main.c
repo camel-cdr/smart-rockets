@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 
+#define GLEW_STATIC
 #include <GL/glew.h>
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
@@ -59,7 +60,8 @@ static struct nk_context *nkctx;
 #define die(...) fprintf(stderr, __VA_ARGS__), exit(EXIT_FAILURE)
 
 
-int main(void)
+int
+main(int argc, char **argv)
 {
 	/* Platform */
 	SDL_Window *window;

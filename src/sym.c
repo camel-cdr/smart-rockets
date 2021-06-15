@@ -146,6 +146,13 @@ static void sym_update_ui(float dt)
 		}
 	}
 
+	nk_layout_row_dynamic(nkctx, 20, 2);
+	if (nk_button_label(nkctx, "vsync on"))
+		SDL_GL_SetSwapInterval(-1);
+	if (nk_button_label(nkctx, "vsync off"))
+		SDL_GL_SetSwapInterval(0);
+
+
 	nk_layout_row_dynamic(nkctx, 20, 1);
 	sym.skip_slider = nk_propertyi(nkctx, "#skip amount:", 1, sym.skip_slider, 1000, 1, 5.0);
 
