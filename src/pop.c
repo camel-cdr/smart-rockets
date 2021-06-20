@@ -110,8 +110,8 @@ static void pop_init(struct Population *this)
 	GL_CALL(glVertexAttribDivisor(1, 1));
 
 	{
-	Vec2 tmp = {0};
-	pop_new_gen(this, tmp);
+		Vec2 tmp = {0};
+		pop_new_gen(this, tmp);
 	}
 
 }
